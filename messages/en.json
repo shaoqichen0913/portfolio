@@ -1,0 +1,37 @@
+{
+  "nav": {
+    "about": "about",
+    "projects": "projects",
+    "blog": "blog"
+  },
+  "hero": {
+    "eyebrow": "Data Engineer · Germany",
+    "title": "Data Platform · DevOps · AI Engineering",
+    "description": "Building resilient data infrastructure at scale — from streaming pipelines and lakehouses to LLM-powered applications. 3+ years bridging data engineering and DevOps in production environments."
+  },
+  "sections": {
+    "experience": "experience",
+    "techStack": "tech stack",
+    "projects": "featured projects",
+    "blog": "latest writing"
+  },
+  "techCategories": {
+    "dataEngineering": "data engineering",
+    "devops": "devops / infra",
+    "ai": "ai / ml"
+  },
+  "project": {
+    "viewProject": "view project",
+    "viewAll": "view all projects",
+    "techStack": "tech stack",
+    "architecture": "architecture",
+    "impact": "impact",
+    "github": "github",
+    "backToProjects": "← back to projects"
+  },
+  "blog": {
+    "viewAll": "view all posts",
+    "backToBlog": "← back to blog",
+    "readingTime": "min read"
+  }
+}

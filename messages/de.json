@@ -1,0 +1,37 @@
+{
+  "nav": {
+    "about": "über mich",
+    "projects": "projekte",
+    "blog": "blog"
+  },
+  "hero": {
+    "eyebrow": "Data Engineer · Deutschland",
+    "title": "Data Platform · DevOps · KI-Engineering",
+    "description": "Aufbau skalierbarer Dateninfrastruktur — von Streaming-Pipelines und Lakehouses bis hin zu KI-gestützten Anwendungen. 3+ Jahre Erfahrung an der Schnittstelle von Data Engineering und DevOps in Produktionsumgebungen."
+  },
+  "sections": {
+    "experience": "berufserfahrung",
+    "techStack": "tech stack",
+    "projects": "projekte",
+    "blog": "aktuelle artikel"
+  },
+  "techCategories": {
+    "dataEngineering": "data engineering",
+    "devops": "devops / infrastruktur",
+    "ai": "ki / ml"
+  },
+  "project": {
+    "viewProject": "projekt ansehen",
+    "viewAll": "alle projekte",
+    "techStack": "tech stack",
+    "architecture": "architektur",
+    "impact": "ergebnisse",
+    "github": "github",
+    "backToProjects": "← zurück zu projekten"
+  },
+  "blog": {
+    "viewAll": "alle artikel",
+    "backToBlog": "← zurück zum blog",
+    "readingTime": "min lesen"
+  }
+}
