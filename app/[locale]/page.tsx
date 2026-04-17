@@ -1,10 +1,12 @@
 import { useTranslations } from 'next-intl';
+import { setRequestLocale } from 'next-intl/server';
 import { experience, techStack } from '@/lib/data';
 import Link from 'next/link';
 import { getAllProjects } from '@/lib/markdown';
 import { TechIcon } from '@/components/TechIcon';
 
 export default function HomePage({ params: { locale } }: { params: { locale: string } }) {
+  setRequestLocale(locale);
   const t = useTranslations();
   const projects = getAllProjects().slice(0, 4);
 

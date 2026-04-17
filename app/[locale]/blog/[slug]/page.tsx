@@ -1,4 +1,5 @@
 import { getBlogPost, getAllBlogPosts } from '@/lib/markdown';
+import { setRequestLocale } from 'next-intl/server';
 import Link from 'next/link';
 
 export async function generateStaticParams() {
@@ -14,6 +15,7 @@ export default async function BlogPostPage({
 }: {
   params: { locale: string; slug: string };
 }) {
+  setRequestLocale(locale);
   const { meta, contentHtml } = await getBlogPost(slug);
 
   return (

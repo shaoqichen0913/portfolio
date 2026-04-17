@@ -1,8 +1,10 @@
 import { useTranslations } from 'next-intl';
+import { setRequestLocale } from 'next-intl/server';
 import { getAllBlogPosts } from '@/lib/markdown';
 import Link from 'next/link';
 
 export default function BlogPage({ params: { locale } }: { params: { locale: string } }) {
+  setRequestLocale(locale);
   const t = useTranslations();
   const posts = getAllBlogPosts();
 
