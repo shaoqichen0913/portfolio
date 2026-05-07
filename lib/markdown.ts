@@ -2,7 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
-import html from 'remark-html';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeStringify from 'rehype-stringify';
+import remarkRehype from 'remark-rehype';
 
 const projectsDir = path.join(process.cwd(), 'content/projects');
 const blogDir = path.join(process.cwd(), 'content/blog');
@@ -47,7 +49,11 @@ export function getAllProjects(): ProjectMeta[] {
 export async function getProject(slug: string, locale: string = 'en') {
   const raw = fs.readFileSync(path.join(projectsDir, `${slug}.md`), 'utf8');
   const { data, content } = matter(raw);
-  const processed = await remark().use(html).process(content);
+  const processed = await remark()
+    .use(remarkRehype)
+    .use(rehypeHighlight)
+    .use(rehypeStringify)
+    .process(content);
   return {
     meta: data as ProjectMeta,
     contentHtml: processed.toString(),
@@ -71,7 +77,11 @@ export function getAllBlogPosts(): BlogMeta[] {
 export async function getBlogPost(slug: string) {
   const raw = fs.readFileSync(path.join(blogDir, `${slug}.md`), 'utf8');
   const { data, content } = matter(raw);
-  const processed = await remark().use(html).process(content);
+  const processed = await remark()
+    .use(remarkRehype)
+    .use(rehypeHighlight)
+    .use(rehypeStringify)
+    .process(content);
   return {
     meta: data as BlogMeta,
     contentHtml: processed.toString(),
