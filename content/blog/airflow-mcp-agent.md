@@ -11,15 +11,14 @@ I've spent years in data engineering, DevOps, and data platform work. Most of th
 
 So when MCP (Model Context Protocol) started getting serious traction, I paid attention.
 
-Not because it's hype. Because I know exactly how much toil lives in the infrastructure layer — and I wanted to see if an agent could actually absorb some of it.
+Not because it's hype. Because I know exactly how much toil lives in the infrastructure layer, and I wanted to see if an agent could actually absorb some of it.
 
----
 
 ## What MCP Changes (In Theory)
 
 The premise is simple. Instead of an AI that just talks about your infrastructure, you give it tools that connect directly to it.
 
-For data platforms, that means an agent that can actually call your Airflow API, read logs, inspect task states, and, when the tool path works and permissions allow it, trigger operational actions — not describe how you'd do those things, but do them.
+For data platforms, that means an agent that can actually call your Airflow API, read logs, inspect task states, and, when the tool path works and permissions allow it, trigger operational actions. Not describe how you'd do those things, but do them.
 
 The setup is a single config file. You tell Claude Code which MCP server to use and how to reach your Airflow instance:
 
@@ -39,7 +38,7 @@ The setup is a single config file. You tell Claude Code which MCP server to use 
 }
 ```
 
-That's it. Now the agent has live access to your Airflow instance — get DAGs, read logs, inspect runs, and, depending on the MCP server behavior and permissions you allow, attempt state-changing operations such as triggering runs or updating run state.
+That's it. Now the agent has live access to your Airflow instance. It can get DAGs, read logs, inspect runs, and, depending on the MCP server behavior and permissions you allow, attempt state-changing operations such as triggering runs or updating run state.
 
 ![Architecture diagram showing Claude Code, MCP servers, Airflow, GitHub, and incident memory](/blog/airflow-mcp-agent/architecture-diagram.png)
 
@@ -47,15 +46,14 @@ That's it. Now the agent has live access to your Airflow instance — get DAGs, 
 
 That's a different kind of useful.
 
----
 
 ## Where the Agent Actually Runs
 
-Before getting into results — a question I'd have asked reading this: is this agent running in some cloud sandbox? A GitHub Actions container? A managed service?
+Before getting into results, a question I'd have asked reading this: is this agent running in some cloud sandbox? A GitHub Actions container? A managed service?
 
 No. It's Claude Code, Anthropic's CLI tool, running locally on my laptop.
 
-The trigger scripts call `claude -p` — print mode, non-interactive — which spins up a Claude session, feeds it a prompt, and pipes the output to a log file:
+The trigger scripts call `claude -p`, Claude Code's non-interactive print mode. It spins up a Claude session, feeds it a prompt, and pipes the output to a log file:
 
 ```bash
 claude -p "$PROMPT" 2>&1 | tee "$LOG_FILE"
@@ -67,7 +65,7 @@ This matters because it means the agent isn't isolated. If you give it `Bash` ac
 
 ### The Permission Model
 
-By default, Claude Code is conservative about actions that can change your environment. Read-only operations can run with less friction, but shell commands, file writes, and many external tool calls require approval unless you explicitly allow them. That's fine for interactive sessions — not fine for autonomous agents running unattended.
+By default, Claude Code is conservative about actions that can change your environment. Read-only operations can run with less friction, but shell commands, file writes, and many external tool calls require approval unless you explicitly allow them. That's fine for interactive sessions. It is not fine for autonomous agents running unattended.
 
 The fix is a pre-authorized allow list in `.claude/settings.json`:
 
@@ -94,18 +92,17 @@ I separated read and write operations deliberately. Read ops (`get_dags`, `get_l
 
 In this POC, I pre-authorized everything the scenarios needed. In production, you'd want to be more surgical.
 
----
 
 ## What I Tested
 
-I set up a local Airflow 2.9.3 instance and ran four scenarios. All POC-level. All intentionally constrained. The question wasn't "can this replace my team" — it was "does this actually close the loop without a human in the middle?"
+I set up a local Airflow 2.9.3 instance and ran four scenarios. All POC-level. All intentionally constrained. The question wasn't "can this replace my team." It was "does this actually close the loop without a human in the middle?"
 
 The four scenarios:
 
-- **S1 — Autonomous Ops** — receive an alert, diagnose, decide: retry or escalate
-- **S2 — Multi-tool Workflow** — trace a DAG failure back to a specific git commit, open a GitHub Issue
-- **S3 — Scheduled Health Review** — generate a daily DAG status report, unprompted
-- **S4 — Stateful Agent** — same as S1, but with memory of past incidents
+- **S1, Autonomous Ops**, receive an alert, diagnose, decide: retry or escalate
+- **S2, Multi-tool Workflow**, trace a DAG failure back to a specific git commit, open a GitHub Issue
+- **S3, Scheduled Health Review**, generate a daily DAG status report, unprompted
+- **S4, Stateful Agent**, same as S1, but with memory of past incidents
 
 Before looking at the results, here's the operational loop I was testing across the scenarios.
 
@@ -113,11 +110,10 @@ Before looking at the results, here's the operational loop I was testing across 
 
 *Figure 2: The core loop is simple: inspect the failed run, classify the error, then retry, escalate, or stop when confidence is too low.*
 
----
 
 ## What Actually Happened
 
-### S1 — Retry vs. Escalate
+### S1, Retry vs. Escalate
 
 This one was the core test of autonomous judgment.
 
@@ -142,7 +138,7 @@ If DETERMINISTIC: do NOT retry. Output a structured escalation report.
 
 What surprised me: I never told it to read the DAG source. It did that on its own to build confidence in its classification.
 
-### S2 — Crossing Tool Boundaries
+### S2, Crossing Tool Boundaries
 
 This one required the agent to move across two systems: Airflow and GitHub. The prompt defined the full chain:
 
@@ -160,7 +156,7 @@ The commit had updated the data records but missed the consumer code on line 15.
 
 The agent opened a GitHub Issue with the commit SHA, the author, the traceback, and a one-line fix. No human looked at a log. No one manually ran `git log`. The issue just appeared.
 
-### S3 — The Health Report
+### S3, The Health Report
 
 I ran a script that fired a prompt at the agent. No other instruction. The prompt told it what to query and what format to use:
 
@@ -170,21 +166,21 @@ Query all active DAGs and their run history for the past 24 hours.
 No human will review your work before it is published.
 ```
 
-It queried 7 DAGs, pulled run history, identified 3 failures, analyzed each one, checked SLA compliance, and wrote a structured markdown report. One thing I would tighten in the next version: the prompt asked for the past 24 hours, but the saved report labeled a wider absolute review window. That's exactly the kind of output-validation check a production version would need. Even so, the report surfaced that one DAG had exhausted all 3 retries on every attempt — and recommended not re-triggering until the external API is confirmed reachable.
+It queried 7 DAGs, pulled run history, identified 3 failures, analyzed each one, checked SLA compliance, and wrote a structured markdown report. One thing I would tighten in the next version: the prompt asked for the past 24 hours, but the saved report labeled a wider absolute review window. That's exactly the kind of output-validation check a production version would need. Even so, the report surfaced that one DAG had exhausted all 3 retries on every attempt, and recommended not re-triggering until the external API is confirmed reachable.
 
 The output looked like something a senior engineer would write after a Monday morning review. Except it took under 5 minutes and nobody had to be awake for it.
 
-### S4 — Memory Changes Everything
+### S4, Memory Changes Everything
 
 Same scenario as S1, but now the agent checks an incident log before doing anything:
 
 ```
-Step 0 — Check incident history FIRST
+Step 0, Check incident history FIRST
 Read incident_log.json. Search for entries matching dag_id={{DAG_ID}}.
 If a matching entry exists: reference it and use it to inform your decision.
 If no matching entry: proceed with full diagnosis.
 
-Step 7 — Write to incident log
+Step 7, Write to incident log
 Append a new entry to incident_log.json after every run.
 ```
 
@@ -195,13 +191,13 @@ The incident log is just a JSON file:
   "timestamp": "2026-05-06T14:23:00Z",
   "dag_id": "dag_code_bug",
   "error_type": "KeyError",
-  "diagnosis": "Deterministic code bug — retrying will always fail.",
+  "diagnosis": "Deterministic code bug, retrying will always fail.",
   "action_taken": "Escalated to human.",
   "outcome": "pending human fix"
 }
 ```
 
-The difference was immediate. Instead of re-deriving the diagnosis from scratch, the agent matched the current failure to yesterday's entry, confirmed the current run showed the same error, and escalated without retrying — citing the prior incident and flagging it as a recurrence.
+The difference was immediate. Instead of re-deriving the diagnosis from scratch, the agent matched the current failure to yesterday's entry, confirmed the current run showed the same error, and escalated without retrying, citing the prior incident and flagging it as a recurrence.
 
 When I ran it a third time, it added an **URGENT** flag on its own. Nobody told it to escalate urgency. It inferred from the pattern that three identical escalations with no resolution warranted a stronger signal.
 
@@ -211,7 +207,6 @@ That's the kind of behavior that makes this interesting.
 
 *Figure 4: The most useful result was not a single success case, but seeing where each workflow closed the loop and where production controls were missing.*
 
----
 
 ## An Unexpected Finding
 
@@ -225,11 +220,10 @@ Both agents grabbed the same Airflow Variable counter. Both made decisions based
 
 The agent that caused the race condition caught it, analyzed it, and reported it:
 
-> *"The ops agent design has no deduplication guard — if the original alert is already resolved, a late-arriving agent will still trigger unnecessary remediation."*
+> *"The ops agent design has no deduplication guard. If the original alert is already resolved, a late-arriving agent will still trigger unnecessary remediation."*
 
 I didn't design this finding. It emerged from the test. And it's exactly the kind of edge case that would surface in production.
 
----
 
 ## If This Were Production
 
@@ -243,32 +237,31 @@ The gap is less about whether the agent can act, and more about whether the surr
 
 **What works at POC scale:**
 - The reasoning was useful within these constrained fixtures. The transient/deterministic classification held up across every run I tested.
-- Memory actually improves decisions — not marginally, noticeably.
+- Memory actually improves decisions, not marginally, noticeably.
 - Cross-tool workflows close loops that would otherwise require human handoff.
 
 **What needs work before I'd trust this in production:**
 
-**Deduplication and idempotency.** The race condition above isn't a corner case — it's what happens when multiple alerts fire for the same incident. Any production agent needs a lock or a "is this already resolved?" check before acting.
+**Deduplication and idempotency.** The race condition above isn't a corner case. It's what happens when multiple alerts fire for the same incident. Any production agent needs a lock or a "is this already resolved?" check before acting.
 
-**Audit trail.** The agent writes to `incident_log.json`. In production, every action — every DAG trigger, every state change — needs to land in an append-only log with timestamps and decision rationale. Not for compliance theater. Because when something goes wrong, you need to know exactly what the agent did and why.
+**Audit trail.** The agent writes to `incident_log.json`. In production, every action needs to land in an append-only log with timestamps and decision rationale: every DAG trigger, every state change, every decision. Not for compliance theater. Because when something goes wrong, you need to know exactly what the agent did and why.
 
-**Blast radius controls.** Right now the agent has broad credentials and pre-authorized write tools; when the MCP write path failed, it could still fall back to direct Airflow REST calls. In production, you'd want scoped permissions — maybe read-only by default, with explicit allowlists for write operations per DAG or per team.
+**Blast radius controls.** Right now the agent has broad credentials and pre-authorized write tools; when the MCP write path failed, it could still fall back to direct Airflow REST calls. In production, you'd want scoped permissions, maybe read-only by default, with explicit allowlists for write operations per DAG or per team.
 
-**Confidence thresholds.** The agent classifies errors as transient or deterministic with high confidence. But what about the ambiguous cases? A production system needs a "not sure — escalate and wait" path, not just a binary.
+**Confidence thresholds.** The agent classifies errors as transient or deterministic with high confidence. But what about the ambiguous cases? A production system needs a "not sure, escalate and wait" path, not just a binary.
 
-**Cost and latency.** Each scenario ran 10–40 tool calls. At scale — hundreds of DAGs, continuous monitoring — that adds up. You'd want to think carefully about when to invoke the agent versus simpler rule-based alerting.
+**Cost and latency.** Each scenario ran 10–40 tool calls. At scale, with hundreds of DAGs and continuous monitoring, that adds up. You'd want to think carefully about when to invoke the agent versus simpler rule-based alerting.
 
----
 
 ## What Production Actually Looks Like
 
-In this POC, I triggered every scenario manually — a shell script calling `claude -p`. That's fine for testing. It's not a real deployment.
+In this POC, I triggered every scenario manually with a shell script calling `claude -p`. That's fine for testing. It's not a real deployment.
 
 In production, two things need to change: how the agent gets triggered, and what runs the agent.
 
 ### Triggering: Scheduled or Event-Driven
 
-The health report scenario (S3) is a natural cron job. You'd schedule it the same way you schedule any recurring task — an Airflow DAG, a cron entry, whatever your platform uses.
+The health report scenario (S3) is a natural cron job. You'd schedule it the same way you schedule any recurring task: an Airflow DAG, a cron entry, whatever your platform uses.
 
 The ops agent (S1, S4) should be event-driven. One direct path is Airflow's `on_failure_callback`. In Airflow 2.x, callbacks are invoked when state changes happen through worker execution, and callback errors show up in scheduler logs rather than task logs, so this needs operational care. Every DAG that you want the agent to watch gets a callback:
 
@@ -338,22 +331,20 @@ async def run_agent(dag_id: str, prompt: str):
                 messages = handle_tool_calls(response, session, messages)
 ```
 
-The MCP servers themselves don't have to change if you keep the same STDIO setup — `mcp-server-apache-airflow` and `@modelcontextprotocol/server-github` can remain the tool providers. What changes is who manages the connection: Claude Code did it automatically via `.mcp.json`; now your service does it explicitly. If you use Anthropic's remote MCP connector instead, you would expose those tools over a supported HTTP transport rather than connecting to local STDIO directly.
+The MCP servers themselves don't have to change if you keep the same STDIO setup. `mcp-server-apache-airflow` and `@modelcontextprotocol/server-github` can remain the tool providers. What changes is who manages the connection: Claude Code did it automatically via `.mcp.json`; now your service does it explicitly. If you use Anthropic's remote MCP connector instead, you would expose those tools over a supported HTTP transport rather than connecting to local STDIO directly.
 
-This also means you control the tool-calling loop directly. You can add your own guardrails — max tool calls per run, allowlisted operations, dry-run mode, audit logging — without depending on Claude Code's permission model.
+This also means you control the tool-calling loop directly. You can add your own guardrails: max tool calls per run, allowlisted operations, dry-run mode, audit logging, without depending on Claude Code's permission model.
 
----
 
 ## Where This Is Actually Going
 
 I'm not convinced MCP agents replace on-call engineers. Not yet.
 
-But I am convinced they can absorb the boring, well-defined part of incident response — the part where a human looks at a log, matches it to a known pattern, and either clicks retry or opens a ticket. That loop, done hundreds of times a month across a data platform, is real toil.
+But I am convinced they can absorb the boring, well-defined part of incident response: the part where a human looks at a log, matches it to a known pattern, and either clicks retry or opens a ticket. That loop, done hundreds of times a month across a data platform, is real toil.
 
-The stateful scenario was the most interesting to me. Not because the recall is impressive — it's just a JSON file. But because it shows the shape of what's possible: an agent that gets better at your specific infrastructure over time, not just a generic assistant that starts from zero every time.
+The stateful scenario was the most interesting to me. Not because the recall is impressive; it's just a JSON file. But because it shows the shape of what's possible: an agent that gets better at your specific infrastructure over time, not just a generic assistant that starts from zero every time.
 
 That's the direction worth watching.
 
----
 
 *The test code, DAG files, prompts, reports, and raw logs are in the [GitHub repo](https://github.com/shaoqichen0913/airflow-mcp-agent). The repo is intended to make the experiment inspectable and rerunnable, with the caveat that agent behavior and hosted model versions can change over time.*
