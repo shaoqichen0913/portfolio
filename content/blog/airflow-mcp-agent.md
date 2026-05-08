@@ -7,6 +7,8 @@ readingTime: 12
 excerpt: "A real POC connecting an AI agent to local Airflow: reading logs, classifying failures, retrying or escalating, tracing bugs to GitHub commits, and exposing the production guardrails needed before trust."
 ---
 
+**TL;DR:** I gave an AI agent access to my local Airflow setup and let it handle failed DAGs. It could read logs, decide when to retry or escalate, trace a bug back to a GitHub commit, and use a small incident log as memory, but the experiment also made the production risks obvious: broad permissions, duplicate responders, missing audit trails, and no safe path for uncertain cases.
+
 I've spent years in data engineering, DevOps, and data platform work. Most of that time was spent building pipelines, debugging DAG failures at 2am, and writing runbooks that nobody reads until something breaks.
 
 So when MCP (Model Context Protocol) started getting serious traction, I paid attention.
