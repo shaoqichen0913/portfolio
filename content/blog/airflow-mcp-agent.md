@@ -7,6 +7,8 @@ readingTime: 10
 excerpt: "I connected an AI agent to a local Airflow setup and tested whether it could diagnose failed DAGs, retry transient failures, escalate deterministic bugs, trace issues to GitHub commits, and use incident memory without a human in the loop."
 ---
 
+> **Repo:** Code, DAG files, prompts, and raw test logs are in the [GitHub repo](https://github.com/shaoqichen0913/airflow-mcp-agent-poc).
+
 I've spent years in data engineering, DevOps, and data platform work. A lot of that work has the same shape: a DAG fails, someone opens Airflow, reads the log, decides whether to retry or escalate, and writes the same kind of note again.
 
 That loop is not intellectually hard. That's the frustrating part. It is just slow, repetitive, and usually happens when nobody wants to be awake.
@@ -213,6 +215,3 @@ A JSON file made the agent smarter over time. Not smarter in general — smarter
 The surprising thing isn't that the agent can be stateful. It's that the state is so small. Three incident entries — a few hundred bytes of JSON — produced behavior that felt like it took months to calibrate. The agent didn't learn anything new. It just remembered what it already knew.
 
 That's worth building on.
-
-
-*Code, DAG files, prompts, and raw test logs are in the [GitHub repo](https://github.com/shaoqichen0913/airflow-mcp-agent).*
