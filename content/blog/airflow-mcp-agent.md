@@ -149,13 +149,13 @@ A file-based memory — not a vector store, not a knowledge graph, just a JSON a
 
 ## What Broke
 
-### The MCP Trigger Tool
+### The MCP Server Trade-off
 
-`mcp__airflow__post_dag_run` returned HTTP 400 on every call: `Property is read-only - 'dag_id'`. The MCP server sends `dag_id` in the request body; Airflow 2.x treats it as a path parameter only. Incompatibility between the MCP server and Airflow's 2.x API.
+There is no official Apache Airflow MCP server yet, so this POC had to choose between community implementations. That matters more than it sounds: different servers make different trade-offs around Airflow 2.x compatibility, authentication, API coverage, maintenance, and whether they need a proxy layer.
 
-Every scenario fell back to direct REST calls for triggering runs. All subsequent polling and log retrieval worked fine over MCP.
+In my early tests, one package worked for some read paths but did not handle the Airflow 2.x trigger path cleanly without a proxy, which led to a `post_dag_run` failure. The final setup uses `mcp-server-apache-airflow`, which connects directly to Airflow with Basic Auth and works with my local Airflow 2.9.3 instance.
 
-This is a practical constraint worth naming. If your Airflow is 2.x and you're using `mcp-server-apache-airflow`, plan for the trigger fallback.
+The lesson is not "MCP trigger is broken." It is that the Airflow MCP ecosystem is still community-led. Before trusting an agent workflow, you need to test the exact server package, version, and Airflow version you plan to use.
 
 ### The Race Condition
 
