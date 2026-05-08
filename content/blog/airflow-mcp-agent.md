@@ -21,7 +21,7 @@ I built a local POC to find out. Some parts worked better than I expected. One p
 
 For most of the past two years, "AI and infrastructure" has meant: type a question, get a command, run it yourself. The agent advises. You execute.
 
-MCP changes that specific thing. Instead of describing what to run, the agent can call tools against the system directly. You give it a tool that calls Airflow — not a prompt that produces a curl command you then paste into your terminal. The `get_log` tool returns the actual log. The trigger path exposed the sharp edge in this POC: `post_dag_run` hit an Airflow 2.x request-body issue, so the agent used a direct REST fallback. The important difference is still that the operational loop can close.
+MCP changes that specific thing. Instead of describing what to run, the agent can call tools against the system directly. You give it a tool that calls Airflow — not a prompt that produces a curl command you then paste into your terminal. The `get_log` tool returns the actual log. The `post_dag_run` tool triggers an actual run. The difference is that the loop closes.
 
 The setup is a config file:
 
@@ -99,7 +99,7 @@ If TRANSIENT: trigger a new run and poll until success or failure.
 If DETERMINISTIC: do NOT retry. Output a structured escalation report.
 ```
 
-**DAG 1** threw `ConnectionError: External API timeout: failed to reach data-service after 3 retries`. The agent classified this as **TRANSIENT** — an infrastructure failure, not a code defect — triggered a new run through the REST fallback, and watched it succeed. Total time from first failure to confirmed recovery: 27 seconds.
+**DAG 1** threw `ConnectionError: External API timeout: failed to reach data-service after 3 retries`. The agent classified this as **TRANSIENT** — an infrastructure failure, not a code defect — triggered a new run, and watched it succeed. Total time from first failure to confirmed recovery: 27 seconds.
 
 **DAG 2** threw `KeyError: 'user_id'`. The agent's classification rationale referenced the DAG source directly — `schema_dict` built from `["username", "email", "created_at"]`, then an access to `schema_dict["user_id"]` on line 9, a key that was never in the dict. The prompt said to classify the error; pulling the source for higher confidence was the agent's own move. Classified as **DETERMINISTIC**. No retry. Escalation report with a two-option fix and the exact line number.
 
@@ -133,14 +133,11 @@ The first time `dag_code_bug` failed, the agent completed a full diagnosis, esca
 
 The second time the same DAG failed, the agent checked the incident log first, matched the current failure to the prior entry, confirmed the error was identical, and escalated immediately — citing the prior incident, skipping the retry analysis entirely. Faster, and more specific.
 
-Here's what changed at each decision point (the "Stateless" column is the stateful agent's own estimate of what a stateless agent would have done — S4 only ran the stateful version):
+Here's what changed at each decision point. The stateless side is the stateful agent's own estimate of what it would have done without incident history; S4 only ran the stateful version.
 
-| Decision point | Stateless (estimated) | Stateful (observed) |
-|---|---|---|
-| Retry? | Might try once to verify | Immediately no — history proves it |
-| Error type analysis | Full deliberation | Skipped — already classified |
-| Escalation speed | After full analysis | Immediate, citing prior case |
-| Human message | "Code bug found" | "Recurrence. Fix still pending since 2026-05-06." |
+![Comparison chart showing how incident memory changes retry, analysis, escalation, and human messaging decisions](/blog/airflow-mcp-agent/stateful-memory-decision-path.png)
+
+*Incident memory turns the same failure from a fresh diagnosis into a known recurrence.*
 
 The third time — during the concurrent-run session where I was running S1 and S4 simultaneously — the agent escalated with **URGENT**. The prompt told it to use history to inform decisions. Three records in, all showing "pending human fix," it inferred that stronger language was warranted. That specific inference wasn't in any prompt instruction; it came from reading the pattern across accumulated entries.
 
