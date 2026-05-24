@@ -4,6 +4,7 @@ import matter from 'gray-matter';
 import { remark } from 'remark';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
+import rehypeRaw from 'rehype-raw';
 import rehypeStringify from 'rehype-stringify';
 import remarkRehype from 'remark-rehype';
 
@@ -79,9 +80,12 @@ export function getAllBlogPosts(): BlogMeta[] {
 export async function getBlogPost(slug: string) {
   const raw = fs.readFileSync(path.join(blogDir, `${slug}.md`), 'utf8');
   const { data, content } = matter(raw);
+  // Blog posts may embed the "paper" design's raw HTML components
+  // (.note, .qa, figure, .model-graph), so the pipeline allows raw HTML.
   const processed = await remark()
     .use(remarkGfm)
-    .use(remarkRehype)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeRaw)
     .use(rehypeHighlight)
     .use(rehypeStringify)
     .process(content);
