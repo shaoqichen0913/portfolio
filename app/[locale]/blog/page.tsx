@@ -20,7 +20,16 @@ export default function BlogPage({ params: { locale } }: { params: { locale: str
             href={`/${locale}/blog/${post.slug}`}
             className="post-entry"
           >
-            <div className="min-w-0">
+            {post.coverImage && (
+              <div className="entry-image" aria-hidden="true">
+                <img
+                  src={post.coverImage}
+                  alt=""
+                  loading="lazy"
+                />
+              </div>
+            )}
+            <div className="entry-content min-w-0">
               <h2 className="entry-title">
                 {locale === 'de' && post.titleDe ? post.titleDe : post.title}
               </h2>

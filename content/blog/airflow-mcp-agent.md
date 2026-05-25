@@ -5,6 +5,7 @@ date: "2026-05-08"
 tags: ["airflow", "mcp", "ai-agents", "data-engineering"]
 readingTime: 10
 excerpt: "I connected an AI agent to a local Airflow setup and tested whether it could diagnose failed DAGs, retry transient failures, escalate deterministic bugs, trace issues to GitHub commits, and use incident memory without a human in the loop."
+coverImage: "/blog/airflow-mcp-agent/architecture-diagram.png"
 ---
 
 > **Repo:** Code, DAG files, prompts, and raw test logs are in the [GitHub repo](https://github.com/shaoqichen0913/airflow-mcp-agent-poc).

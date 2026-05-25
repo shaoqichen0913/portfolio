@@ -19,17 +19,17 @@ export default async function BlogPostPage({
   const { meta, contentHtml } = await getBlogPost(slug);
 
   return (
-    <div>
+    <div className="blog-post-shell">
       <Link
         href={`/${locale}/blog`}
-        className="font-mono text-xs text-gray-400 hover:text-[#b8341a] transition-colors mb-6 inline-block"
+        className="font-mono text-xs text-gray-400 hover:text-[#b8341a] transition-colors mb-10 inline-block"
       >
         ← {locale === 'de' ? 'zurück zum blog' : 'back to blog'}
       </Link>
 
       <article className="blog-paper blog-article">
         <header>
-          <div className="crumb">blog / {slug}.md</div>
+          <div className="crumb">blog / {slug}</div>
           <div className="post-meta">
             {meta.date}
             {meta.readingTime && ` · ${meta.readingTime} min read`}

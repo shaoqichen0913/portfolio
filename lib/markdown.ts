@@ -1,12 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { remark } from 'remark';
-import remarkGfm from 'remark-gfm';
-import rehypeHighlight from 'rehype-highlight';
-import rehypeRaw from 'rehype-raw';
-import rehypeStringify from 'rehype-stringify';
-import remarkRehype from 'remark-rehype';
 
 const projectsDir = path.join(process.cwd(), 'content/projects');
 const blogDir = path.join(process.cwd(), 'content/blog');
@@ -33,6 +27,7 @@ export interface BlogMeta {
   tags: string[];
   readingTime?: number;
   excerpt: string;
+  coverImage?: string;
 }
 
 export function getAllProjects(): ProjectMeta[] {
@@ -49,6 +44,11 @@ export function getAllProjects(): ProjectMeta[] {
 }
 
 export async function getProject(slug: string, locale: string = 'en') {
+  const { remark } = await import('remark');
+  const { default: remarkGfm } = await import('remark-gfm');
+  const { default: remarkRehype } = await import('remark-rehype');
+  const { default: rehypeHighlight } = await import('rehype-highlight');
+  const { default: rehypeStringify } = await import('rehype-stringify');
   const raw = fs.readFileSync(path.join(projectsDir, `${slug}.md`), 'utf8');
   const { data, content } = matter(raw);
   const processed = await remark()
@@ -78,6 +78,12 @@ export function getAllBlogPosts(): BlogMeta[] {
 }
 
 export async function getBlogPost(slug: string) {
+  const { remark } = await import('remark');
+  const { default: remarkGfm } = await import('remark-gfm');
+  const { default: remarkRehype } = await import('remark-rehype');
+  const { default: rehypeRaw } = await import('rehype-raw');
+  const { default: rehypeHighlight } = await import('rehype-highlight');
+  const { default: rehypeStringify } = await import('rehype-stringify');
   const raw = fs.readFileSync(path.join(blogDir, `${slug}.md`), 'utf8');
   const { data, content } = matter(raw);
   // Blog posts may embed the "paper" design's raw HTML components

@@ -12,46 +12,46 @@ export default function Nav({ locale }: { locale: string }) {
   const switchPath = pathname.replace(`/${locale}`, `/${otherLocale}`);
 
   const isActive = (segment: string) => pathname.includes(segment);
+  const linkClass = (active: boolean) =>
+    `font-mono text-[11px] tracking-[0.08em] uppercase document-link ${
+      active ? 'document-link-active' : ''
+    }`;
 
   return (
-    <header className="max-w-3xl mx-auto px-6 py-6 flex items-center justify-between mb-8">
-      <Link href={`/${locale}`} className="font-mono text-sm tracking-wider text-gray-800 dark:text-gray-200 hover:opacity-70 transition-opacity">
+    <header className="document-chrome flex items-center justify-between gap-8">
+      <Link
+        href={`/${locale}`}
+        className="font-mono text-[12px] tracking-[0.1em] uppercase document-link text-[var(--ink)]"
+      >
         shaoqi.chen
       </Link>
 
-      <nav className="flex items-center gap-6">
+      <nav className="flex items-center gap-5">
         <Link
           href={`/${locale}`}
-          className={`font-mono text-xs tracking-wide transition-colors ${
-            pathname === `/${locale}` ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-          }`}
+          className={linkClass(pathname === `/${locale}`)}
         >
           {t('about')}
         </Link>
         <Link
           href={`/${locale}/projects`}
-          className={`font-mono text-xs tracking-wide transition-colors ${
-            isActive('/projects') ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-          }`}
+          className={linkClass(isActive('/projects'))}
         >
           {t('projects')}
         </Link>
         <Link
           href={`/${locale}/blog`}
-          className={`font-mono text-xs tracking-wide transition-colors ${
-            isActive('/blog') ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-          }`}
+          className={linkClass(isActive('/blog'))}
         >
           {t('blog')}
         </Link>
 
         <Link
           href={switchPath}
-          className="font-mono text-xs px-2 py-1 border border-gray-200 dark:border-gray-700 rounded text-gray-500 dark:text-gray-400 hover:border-gray-400 transition-colors ml-2"
+          className="font-mono text-[11px] tracking-[0.08em] uppercase document-link ml-1"
         >
           {otherLocale.toUpperCase()}
         </Link>
-
       </nav>
     </header>
   );

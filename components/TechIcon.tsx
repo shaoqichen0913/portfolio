@@ -10,6 +10,7 @@ import {
   SiAnsible,
   SiJenkins,
   SiPython,
+  SiPytorch,
   SiLangchain,
 } from 'react-icons/si';
 import { IconType } from 'react-icons';
@@ -26,6 +27,7 @@ const iconMap: Record<string, IconType> = {
   'Ansible': SiAnsible,
   'Jenkins': SiJenkins,
   'Python': SiPython,
+  'PyTorch': SiPytorch,
   'LangChain': SiLangchain,
 };
 
