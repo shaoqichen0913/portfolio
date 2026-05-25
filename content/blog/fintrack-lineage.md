@@ -8,6 +8,8 @@ excerpt: "dbt makes transformation lineage visible, but a regulated report needs
 coverImage: "/blog/fintrack-lineage/architecture.png"
 ---
 
+> **Public repo:** Code, infrastructure, dbt models, Airflow DAGs, and lineage API implementation are in [dbt-iceberg-lineage-demo](https://github.com/shaoqichen0913/dbt-iceberg-lineage-demo).
+
 <div class="toc">
     <div class="toc-title">Contents</div>
     <ol>
